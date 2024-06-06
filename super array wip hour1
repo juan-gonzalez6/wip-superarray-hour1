@@ -1,0 +1,55 @@
+#pragma once
+
+#include <iostream>		// the library for cout and endl
+#include <stdlib.h>		// the library for system
+#include <time.h>		// the library for clock
+#include <fstream>		// the library for ifstream
+#include <string>		// the library for string
+#include <Windows.h>	// sleep command
+#include "ICS_ConsoleHelper.h" // colors
+
+using namespace std;
+
+template <typename T>
+class SuperArray
+{
+private:	 // Private atributes
+	int _maxSize = 10;  // Maximum size of the array
+	int _pointer = 0;   // Pointer to the current position in the array
+	int _currentSize = 0; // Current size of the array
+	T* _data;   // States the array that will be used
+
+public:
+	// Default constructor
+	SuperArray()
+	{
+		_data = new T[_maxSize]; // Initialize the array with the maximum size
+	}
+
+	// Copy constructor
+	SuperArray(const SuperArray& a)
+		:
+		_currentSize(a._currentSize)
+	{
+		_data = new T[_maxSize]; // Allocate memory for the new array
+		for (int i = 0; i < a._currentSize; i++)
+		{
+			_data[i] = a._data[i]; // Copy elements from the original array to the new array
+		}
+	}
+
+	// Destructor
+	~SuperArray()
+	{
+		for (int i = 0; i < _currentSize; i++)
+		{
+			_data[i] = NULL; // Clear the data stored in the array
+		}
+		delete[] _data; // Free memory allocated for the array
+	}
+
+	// Get the current size of the array
+	int getSize()
+	{
+		return _currentSize;	 // And return it
+	}
