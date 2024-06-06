@@ -1,0 +1,172 @@
+#pragma once
+
+#include <iostream>		// the library for cout and endl
+#include <stdlib.h>		// the library for system
+#include <time.h>		// the library for clock
+#include <fstream>		// the library for ifstream
+#include <string>		// the library for string
+#include <Windows.h>	// sleep command
+#include "ICS_ConsoleHelper.h" // colors
+
+using namespace std;
+
+template <typename T>
+class SuperArray
+{
+private:	 // Private atributes
+	int _maxSize = 10;  // Maximum size of the array
+	int _pointer = 0;   // Pointer to the current position in the array
+	int _currentSize = 0; // Current size of the array
+	T* _data;   // States the array that will be used
+
+public:
+	// Default constructor
+	SuperArray()
+	{
+		_data = new T[_maxSize]; // Initialize the array with the maximum size
+	}
+
+	// Copy constructor
+	SuperArray(const SuperArray& a)
+		:
+		_currentSize(a._currentSize)
+	{
+		_data = new T[_maxSize]; // Allocate memory for the new array
+		for (int i = 0; i < a._currentSize; i++)
+		{
+			_data[i] = a._data[i]; // Copy elements from the original array to the new array
+		}
+	}
+
+	// Destructor
+	~SuperArray()
+	{
+		for (int i = 0; i < _currentSize; i++)
+		{
+			_data[i] = NULL; // Clear the data stored in the array
+		}
+		delete[] _data; // Free memory allocated for the array
+	}
+
+	// Get the current size of the array
+	int getSize()
+	{
+		return _currentSize;	 // And return it
+	}
+
+	// Overloaded assignment operator
+	void operator=(SuperArray& a)
+	{
+		if (_currentSize > _maxSize)
+		{
+			_maxSize = _currentSize++; // Increase the maximum size if needed
+		}
+
+		_currentSize = a._currentSize; // Update the current size
+		delete[] _data; // Free memory allocated for the previous array
+		_data = new int[_maxSize]; // Allocate memory for the new array
+
+		for (int i = 0; i < _currentSize; i++)
+		{
+			_data[i] = a._data[i]; // Copy elements from the assigned array to the current array
+		}
+	}
+
+	// Overloaded subscript operator for accessing elements of the array
+	T& operator[](int index)
+	{
+		if (index >= 0)
+		{
+			return _data[index]; // Return the element at the specified index
+		}
+		else
+		{
+			cout << ICS_INTENSE_RED_TEXT << "Index isn't a valid entry!" << ICS_INTENSE_WHITE_TEXT << endl; // Display error message for invalid index
+		}
+	}
+
+	// Insert a value at the specified index
+	void insert(int index, T value)
+	{
+		if (_currentSize == _maxSize)
+		{
+			grow(); // Increase the size of the array if it's full
+		}
+
+		if (index >= 0 and index <= _currentSize)
+		{
+			{
+				T holder = _data[index];
+				for (int i = _currentSize; i > index; i--)
+				{
+					_data[i] = _data[i - 1]; // Shift elements to make space for the new value
+				}
+				_data[index] = value; // Insert the new value at the specified index
+				_currentSize++; // Increment the current size
+			}
+		}
+		else
+		{
+			cout << ICS_INTENSE_RED_TEXT << "Index isn't a valid entry!" << ICS_INTENSE_WHITE_TEXT << endl; // Display error message for invalid index
+		}
+	}
+
+	// Insert a value at the beginning of the array
+	void pushFront(T value)
+	{
+		insert(0, value);
+	}
+
+	// Insert a value at the end of the array
+	void pushBack(T value)
+	{
+		insert(_currentSize, value);
+	}
+
+	// Remove the value at the specified index
+	T remove(int index)
+	{
+		T holder = _data[index]; // Store the value to be removed
+		_data[index] = NULL; // Clear the value at the specified index
+
+		if (index >= 0)
+		{
+			if (index > _maxSize)
+			{
+				for (int i = index; i < _maxSize; i++)
+				{
+					_data[i] = _data[i + 1]; // Shift elements to fill the gap
+				}
+				_currentSize--; // Decrement the current size
+			}
+		}
+		else
+		{
+			cout << ICS_INTENSE_RED_TEXT << "Index isn't a valid entry!" << ICS_INTENSE_WHITE_TEXT << endl; // Display error message for invalid index
+		}
+		return holder; // Return the removed value
+	}
+
+	// Remove the value at the beginning of the array
+	T popFront()
+	{
+		return remove(0);
+	}
+
+	// Remove the value at the end of the array
+	T popBack()
+	{
+		return remove(_maxSize - 1);
+	}
+
+	// Shuffle the elements of the array
+	void shuffle()
+	{
+		for (int i = 0; i < _currentSize; i++)
+		{
+			int teleporter = rand() % _currentSize; // Generate a random index
+			T holder = _data[teleporter]; // Store the value at the random index
+			_data[teleporter] = _data[i]; // Swap values
+			_data[i] = holder;
+		}
+	}
